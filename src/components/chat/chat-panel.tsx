@@ -135,7 +135,10 @@ export function ChatPanel({
   }
 
   return (
-    <div className={cn("flex h-full flex-col bg-background", className)}>
+    <div
+      aria-label={`Chat with ${botName}`}
+      className={cn("flex h-full flex-col bg-background", className)}
+    >
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
         <Bubble role="assistant" accentColor={accentColor}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{welcomeMessage}</ReactMarkdown>

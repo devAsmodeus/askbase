@@ -19,20 +19,22 @@ export function EmbedChat({
   accentColor,
   showBranding,
 }: EmbedChatProps) {
-  const [parentOrigin, setParentOrigin] = React.useState("");
-  const [visitorId, setVisitorId] = React.useState("");
-
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setParentOrigin(params.get("parent") ?? "");
-
+  const [parentOrigin] = React.useState(() =>
+    typeof window === "undefined"
+      ? ""
+      : (new URLSearchParams(window.location.search).get("parent") ?? "")
+  );
+  const [visitorId] = React.useState(() => {
+    if (typeof window === "undefined") return "";
     let vid = localStorage.getItem("askbase_visitor_id");
     if (!vid) {
       vid = crypto.randomUUID();
       localStorage.setItem("askbase_visitor_id", vid);
     }
-    setVisitorId(vid);
+    return vid;
+  });
 
+  React.useEffect(() => {
     // Tint the launcher bubble on the host page
     window.parent?.postMessage({ type: "askbase:accent", color: accentColor }, "*");
   }, [accentColor]);
