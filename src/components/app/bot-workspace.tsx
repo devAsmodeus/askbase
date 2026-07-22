@@ -271,7 +271,7 @@ function KnowledgeTab({
                 Paste text
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
               <DialogHeader>
                 <DialogTitle>Paste text</DialogTitle>
                 <DialogDescription>
@@ -293,7 +293,8 @@ function KnowledgeTab({
                   <Label htmlFor="paste-text">Text</Label>
                   <Textarea
                     id="paste-text"
-                    rows={10}
+                    rows={8}
+                    className="max-h-60"
                     required
                     placeholder="Paste your content here…"
                     value={pasteText}

@@ -284,7 +284,7 @@ export default function LandingPage() {
       </footer>
 
       {demoBotId && (
-        <Script src="/widget.js" data-bot-id={demoBotId} strategy="lazyOnload" />
+        <Script src="/widget.js" data-bot-id={demoBotId} strategy="afterInteractive" />
       )}
     </div>
   );
