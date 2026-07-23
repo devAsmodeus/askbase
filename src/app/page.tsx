@@ -247,7 +247,7 @@ export default function LandingPage() {
         </div>
         <div className="relative mx-auto max-w-6xl px-4">
           <Reveal>
-            <h2 className="font-display text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2 className="font-display text-center text-3xl font-semibold tracking-tight sm:text-5xl">
               Everything you need, nothing you don&apos;t
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-center text-muted-foreground">
@@ -288,7 +288,7 @@ export default function LandingPage() {
         </div>
         <div className="relative mx-auto max-w-6xl px-4">
           <Reveal>
-            <h2 className="font-display text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2 className="font-display text-center text-3xl font-semibold tracking-tight sm:text-5xl">
               Simple, honest pricing
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-center text-muted-foreground">

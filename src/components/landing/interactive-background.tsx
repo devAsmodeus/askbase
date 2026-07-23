@@ -1,16 +1,47 @@
 "use client";
 
 import * as React from "react";
-import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
-import { KnowledgeField } from "./knowledge-field";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+} from "motion/react";
+import { RisingBubbles } from "./rising-bubbles";
+
+/** Scroll stops for the page-wide color fade (Cann-style). */
+const LIGHT_STOPS = ["#e0e7ff", "#fae8ff", "#fef3c7", "#fce7f3", "#e0e7ff"];
+const DARK_STOPS = ["#1e1b4b", "#3b0764", "#451a03", "#500724", "#1e1b4b"];
+const OFFSETS = [0, 0.3, 0.55, 0.8, 1];
 
 /**
- * Living page background: a soft gradient glow follows the cursor while two
- * organic blobs slowly morph and drift behind the content. Static for
- * reduced-motion users.
+ * Living page background, themed like a soda site for knowledge:
+ * the whole page cross-fades between pastel tints as you scroll, thin
+ * outlined chat-bubbles/docs/question-marks rise like carbonation, and a
+ * soft glow follows the cursor.
  */
 export function InteractiveBackground() {
   const prefersReduced = useReducedMotion();
+  const [isDark, setIsDark] = React.useState(false);
+
+  React.useEffect(() => {
+    const html = document.documentElement;
+    const update = () => setIsDark(html.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const { scrollYProgress } = useScroll();
+  const backgroundColor = useTransform(
+    scrollYProgress,
+    OFFSETS,
+    isDark ? DARK_STOPS : LIGHT_STOPS
+  );
+
   const mx = useMotionValue(-400);
   const my = useMotionValue(-400);
   const x = useSpring(mx, { stiffness: 40, damping: 18, mass: 0.8 });
@@ -31,13 +62,17 @@ export function InteractiveBackground() {
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 transform-gpu overflow-hidden"
     >
-      {/* Colorful animated base */}
-      <div className="landing-gradient absolute inset-0" />
-
-      {/* Drifting color blobs */}
-      <div className="blob blob-a absolute left-[-10%] top-[-15%] h-[50vmax] w-[50vmax]" />
-      <div className="blob blob-b absolute bottom-[-20%] right-[-12%] h-[45vmax] w-[45vmax]" />
-      <div className="blob blob-c absolute left-[30%] top-[50%] h-[35vmax] w-[35vmax]" />
+      {/* Scroll color fade — flat tint that changes with scroll position */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          backgroundColor: prefersReduced
+            ? isDark
+              ? DARK_STOPS[0]
+              : LIGHT_STOPS[0]
+            : backgroundColor,
+        }}
+      />
 
       {/* Cursor-follow glow */}
       {!prefersReduced && (
@@ -47,16 +82,13 @@ export function InteractiveBackground() {
             left: x,
             top: y,
             background:
-              "radial-gradient(circle, rgba(99, 102, 241, 0.28) 0%, rgba(217, 70, 239, 0.12) 40%, transparent 70%)",
+              "radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, rgba(217, 70, 239, 0.07) 40%, transparent 70%)",
           }}
         />
       )}
 
-      {/* Soft veil keeps text readable without killing the color */}
-      <div className="absolute inset-0 bg-background/25" />
-
-      {/* Knowledge constellation — nodes & links reacting to the cursor */}
-      <KnowledgeField />
+      {/* Rising outlined bubbles: chat, docs, question marks */}
+      <RisingBubbles />
     </div>
   );
 }

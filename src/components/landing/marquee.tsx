@@ -13,9 +13,18 @@ const ITEMS = [
 function Row() {
   return (
     <>
-      {ITEMS.map((item) => (
+      {ITEMS.map((item, i) => (
         <span key={item} className="mx-6 inline-flex items-center gap-3 sm:mx-8">
-          <span className="font-display text-lg font-semibold tracking-tight sm:text-2xl">
+          <span
+            className={`font-display text-xl font-bold tracking-tight sm:text-3xl ${
+              i % 2 === 1 ? "text-transparent" : ""
+            }`}
+            style={
+              i % 2 === 1
+                ? { WebkitTextStroke: "1.3px rgb(99 102 241 / 0.75)" }
+                : undefined
+            }
+          >
             {item}
           </span>
           <Sparkles className="size-4 text-indigo-400" />

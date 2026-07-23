@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  AnimatePresence,
   motion,
   useMotionValueEvent,
   useReducedMotion,
@@ -199,25 +198,22 @@ export function PinnedSteps() {
             <p className="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               How it works
             </p>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -24, transition: { duration: 0.25 } }}
-                transition={{ duration: 0.45, ease: EASE }}
-              >
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: EASE }}
+            >
                 <span
                   className={`font-mono text-7xl font-bold tabular-nums opacity-15 sm:text-8xl ${active.accent}`}
                 >
                   0{step + 1}
                 </span>
-                <h2 className="font-display mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+                <h2 className="font-display mt-2 text-3xl font-semibold tracking-tight sm:text-5xl">
                   {active.title}
                 </h2>
                 <p className="mt-4 max-w-md text-muted-foreground">{active.text}</p>
               </motion.div>
-            </AnimatePresence>
 
             {/* Progress rail */}
             <div className="mt-10 flex items-center gap-2">
@@ -235,17 +231,11 @@ export function PinnedSteps() {
             </div>
           </div>
 
-          {/* Right: animated scene */}
+          {/* Right: animated scene — remounts per step, scenes animate themselves in */}
           <div className="flex min-h-[280px] items-center justify-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                className="flex w-full justify-center"
-                exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.2 } }}
-              >
-                <Scene />
-              </motion.div>
-            </AnimatePresence>
+            <div key={step} className="flex w-full justify-center">
+              <Scene />
+            </div>
           </div>
         </div>
       </motion.div>
