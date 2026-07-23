@@ -166,30 +166,69 @@ function KnowledgeTab({
 
   async function handleUpload(files: FileList | null) {
     if (!files || files.length === 0) return;
-    const file = files[0];
-    if (file.size > plan.maxDocBytes) {
-      toast.error(
-        `“${file.name}” is larger than the ${formatBytes(plan.maxDocBytes)} limit of your ${plan.name} plan.`
+    const all = Array.from(files);
+
+    // Client-side guards; the database enforces the same limits server-side.
+    const slots = Math.max(0, plan.maxDocsPerBot - documents.length);
+    if (all.length > slots) {
+      toast.warning(
+        `Only ${slots} document slot${slots === 1 ? "" : "s"} left on the ${plan.name} plan — uploading the first ${slots} file${slots === 1 ? "" : "s"}.`
       );
+    }
+    const queue: File[] = [];
+    for (const file of all.slice(0, slots)) {
+      if (file.size > plan.maxDocBytes) {
+        toast.error(
+          `“${file.name}” is larger than the ${formatBytes(plan.maxDocBytes)} limit of your ${plan.name} plan.`
+        );
+      } else {
+        queue.push(file);
+      }
+    }
+    if (queue.length === 0) {
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
+
     setUploading(true);
-    const toastId = toast.loading(`Processing “${file.name}”…`);
-    try {
-      const form = new FormData();
-      form.set("botId", bot.id);
-      form.set("file", file);
-      const res = await fetch("/api/ingest", { method: "POST", body: form });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Upload failed");
-      toast.success(`“${file.name}” ready — ${json.chunks} chunks indexed`, { id: toastId });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed", { id: toastId });
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      refresh();
+    const toastId = toast.loading(`Processing “${queue[0].name}”…`);
+    let indexed = 0;
+    let failed = 0;
+    for (const [i, file] of queue.entries()) {
+      toast.loading(
+        queue.length > 1
+          ? `Processing ${i + 1}/${queue.length} — “${file.name}”…`
+          : `Processing “${file.name}”…`,
+        { id: toastId }
+      );
+      try {
+        const form = new FormData();
+        form.set("botId", bot.id);
+        form.set("file", file);
+        const res = await fetch("/api/ingest", { method: "POST", body: form });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error ?? "Upload failed");
+        indexed++;
+      } catch (err) {
+        failed++;
+        toast.error(
+          `“${file.name}”: ${err instanceof Error ? err.message : "upload failed"}`
+        );
+      }
     }
+    if (failed === 0) {
+      toast.success(
+        indexed === 1
+          ? `“${queue[0].name}” ready`
+          : `${indexed} files indexed and ready`,
+        { id: toastId }
+      );
+    } else {
+      toast.warning(`${indexed} indexed, ${failed} failed`, { id: toastId });
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    refresh();
   }
 
   async function handlePaste(e: React.FormEvent) {
@@ -246,6 +285,7 @@ function KnowledgeTab({
           <input
             ref={fileInputRef}
             type="file"
+            multiple
             accept=".pdf,.txt,.md,.markdown,.csv,.json,.html"
             className="hidden"
             onChange={(e) => handleUpload(e.target.files)}
@@ -259,7 +299,7 @@ function KnowledgeTab({
             ) : (
               <FileUp className="size-4" />
             )}
-            Upload file
+            Upload files
           </Button>
           <Dialog open={pasteOpen} onOpenChange={setPasteOpen}>
             <DialogTrigger asChild>
