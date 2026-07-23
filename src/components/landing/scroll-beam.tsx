@@ -74,48 +74,30 @@ export function ScrollBeam() {
             <stop offset="1" stopColor="#6366F1" />
           </linearGradient>
           <filter id="beam-blur-wide" x="-50%" y="-5%" width="200%" height="110%">
-            <feGaussianBlur stdDeviation="16" />
+            <feGaussianBlur stdDeviation="28" />
           </filter>
           <filter id="beam-blur-mid" x="-50%" y="-5%" width="200%" height="110%">
-            <feGaussianBlur stdDeviation="5" />
+            <feGaussianBlur stdDeviation="12" />
           </filter>
         </defs>
-        {/* Luminous halo */}
+        {/* Wide luminous halo — no hard edges anywhere */}
         <motion.path
           d={d}
           stroke="url(#beam-gradient)"
-          strokeWidth={44}
+          strokeWidth={110}
           strokeLinecap="round"
-          opacity={0.35}
+          opacity={0.3}
           filter="url(#beam-blur-wide)"
           style={{ pathLength: prefersReduced ? 1 : progress }}
         />
-        {/* Inner glow */}
+        {/* Bright diffuse body */}
         <motion.path
           d={d}
           stroke="url(#beam-gradient)"
-          strokeWidth={16}
+          strokeWidth={52}
           strokeLinecap="round"
           opacity={0.5}
           filter="url(#beam-blur-mid)"
-          style={{ pathLength: prefersReduced ? 1 : progress }}
-        />
-        {/* Bright core */}
-        <motion.path
-          d={d}
-          stroke="url(#beam-gradient)"
-          strokeWidth={6}
-          strokeLinecap="round"
-          opacity={0.9}
-          style={{ pathLength: prefersReduced ? 1 : progress }}
-        />
-        {/* White-hot center line */}
-        <motion.path
-          d={d}
-          stroke="#fff"
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          opacity={0.6}
           style={{ pathLength: prefersReduced ? 1 : progress }}
         />
       </svg>
