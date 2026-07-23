@@ -20,13 +20,7 @@ const FILE_KINDS: FileKind[] = [
   { label: "TXT", r: 100, g: 116, b: 139 }, // slate
 ];
 
-const STROKES = [
-  "99, 102, 241", // indigo
-  "217, 70, 239", // fuchsia
-  "217, 119, 6", // amber
-];
-
-type Kind = "file" | "book" | "chat" | "circle";
+type Kind = "file" | "table" | "db" | "book" | "chart" | "chat";
 
 type Bubble = {
   kind: Kind;
@@ -38,16 +32,23 @@ type Bubble = {
   swayAmp: number;
   swayFreq: number;
   phase: number;
-  stroke: string;
-  alpha: number;
 };
 
 function makeBubble(w: number, h: number, initial: boolean): Bubble {
   const roll = Math.random();
-  // Half the fizz is file badges, the rest keeps the airy feel
-  const kind: Kind = roll < 0.5 ? "file" : roll < 0.62 ? "book" : roll < 0.76 ? "chat" : "circle";
-  const size =
-    kind === "file" || kind === "book" ? 22 + Math.random() * 20 : 8 + Math.random() * 22;
+  const kind: Kind =
+    roll < 0.42
+      ? "file"
+      : roll < 0.56
+        ? "table"
+        : roll < 0.68
+          ? "book"
+          : roll < 0.8
+            ? "chart"
+            : roll < 0.9
+              ? "db"
+              : "chat";
+  const size = 24 + Math.random() * 30;
   return {
     kind,
     file: FILE_KINDS[Math.floor(Math.random() * FILE_KINDS.length)],
@@ -58,8 +59,6 @@ function makeBubble(w: number, h: number, initial: boolean): Bubble {
     swayAmp: 8 + Math.random() * 22,
     swayFreq: 0.3 + Math.random() * 0.5,
     phase: Math.random() * Math.PI * 2,
-    stroke: STROKES[Math.floor(Math.random() * STROKES.length)],
-    alpha: 0.18 + Math.random() * 0.22,
   };
 }
 
@@ -107,46 +106,127 @@ function drawBubble(ctx: CanvasRenderingContext2D, b: Bubble, x: number, y: numb
       ctx.fillText(b.file.label, x, top + h * 0.62);
       break;
     }
-    case "book": {
-      // Open book: two page halves + spine
-      const w = s * 1.15;
-      const h = s * 0.75;
-      ctx.strokeStyle = `rgba(${b.stroke}, ${b.alpha + 0.12})`;
-      ctx.lineWidth = 1.4;
+    case "table": {
+      // Mini spreadsheet: green sheet, white header band and gridlines
+      const w = s;
+      const h = s * 0.78;
+      const left = x - w / 2;
+      const top = y - h / 2;
+      ctx.fillStyle = "rgba(16, 163, 74, 0.45)";
       ctx.beginPath();
-      ctx.moveTo(x, y - h * 0.28);
-      ctx.quadraticCurveTo(x - w * 0.28, y - h * 0.55, x - w / 2, y - h * 0.32);
-      ctx.lineTo(x - w / 2, y + h * 0.35);
-      ctx.quadraticCurveTo(x - w * 0.28, y + h * 0.12, x, y + h * 0.4);
-      ctx.quadraticCurveTo(x + w * 0.28, y + h * 0.12, x + w / 2, y + h * 0.35);
-      ctx.lineTo(x + w / 2, y - h * 0.32);
-      ctx.quadraticCurveTo(x + w * 0.28, y - h * 0.55, x, y - h * 0.28);
-      ctx.moveTo(x, y - h * 0.28);
-      ctx.lineTo(x, y + h * 0.4);
+      ctx.roundRect(left, top, w, h, 3);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+      ctx.beginPath();
+      ctx.roundRect(left, top, w, h * 0.24, 3);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      for (let i = 1; i < 3; i++) {
+        ctx.moveTo(left + (w * i) / 3, top + h * 0.24);
+        ctx.lineTo(left + (w * i) / 3, top + h);
+      }
+      ctx.moveTo(left, top + h * 0.62);
+      ctx.lineTo(left + w, top + h * 0.62);
       ctx.stroke();
+      break;
+    }
+    case "db": {
+      // Database cylinder
+      const w = s * 0.85;
+      const h = s;
+      const ry = w * 0.22;
+      const left = x - w / 2;
+      const top = y - h / 2;
+      ctx.fillStyle = "rgba(14, 165, 233, 0.45)";
+      ctx.beginPath();
+      ctx.ellipse(x, top + h - ry, w / 2, ry, 0, 0, Math.PI);
+      ctx.lineTo(left, top + ry);
+      ctx.ellipse(x, top + ry, w / 2, ry, 0, Math.PI, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+      ctx.beginPath();
+      ctx.ellipse(x, top + ry, w / 2, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.ellipse(x, top + h * 0.55, w / 2, ry, 0, 0, Math.PI);
+      ctx.stroke();
+      break;
+    }
+    case "book": {
+      // Closed journal: violet cover, darker spine, title lines
+      const w = s * 0.8;
+      const h = s;
+      const left = x - w / 2;
+      const top = y - h / 2;
+      ctx.fillStyle = "rgba(139, 92, 246, 0.45)";
+      ctx.beginPath();
+      ctx.roundRect(left, top, w, h, 3.5);
+      ctx.fill();
+      ctx.fillStyle = "rgba(109, 40, 217, 0.55)";
+      ctx.beginPath();
+      ctx.roundRect(left, top, w * 0.2, h, 3.5);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(left + w * 0.36, top + h * 0.32);
+      ctx.lineTo(left + w * 0.82, top + h * 0.32);
+      ctx.moveTo(left + w * 0.36, top + h * 0.46);
+      ctx.lineTo(left + w * 0.68, top + h * 0.46);
+      ctx.stroke();
+      break;
+    }
+    case "chart": {
+      // Bar chart card
+      const w = s;
+      const h = s * 0.82;
+      const left = x - w / 2;
+      const top = y - h / 2;
+      ctx.fillStyle = "rgba(245, 158, 11, 0.42)";
+      ctx.beginPath();
+      ctx.roundRect(left, top, w, h, 3.5);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      const bw = w * 0.16;
+      const heights = [0.32, 0.55, 0.42];
+      heights.forEach((bh, i) => {
+        ctx.beginPath();
+        ctx.roundRect(
+          left + w * (0.18 + i * 0.24),
+          top + h * (0.88 - bh),
+          bw,
+          h * bh,
+          1.5
+        );
+        ctx.fill();
+      });
       break;
     }
     case "chat": {
+      // Filled chat bubble with typing dots
       const w = s;
       const h = s * 0.72;
-      ctx.strokeStyle = `rgba(${b.stroke}, ${b.alpha})`;
-      ctx.lineWidth = 1.2;
+      ctx.fillStyle = "rgba(99, 102, 241, 0.45)";
       ctx.beginPath();
       ctx.roundRect(x - w / 2, y - h / 2, w, h, h / 3);
-      ctx.stroke();
+      ctx.fill();
       ctx.beginPath();
-      ctx.moveTo(x - w / 6, y + h / 2);
+      ctx.moveTo(x - w / 6, y + h / 2 - 1);
       ctx.lineTo(x - w / 4, y + h / 2 + s / 5);
-      ctx.lineTo(x + w / 12, y + h / 2);
-      ctx.stroke();
-      break;
-    }
-    case "circle": {
-      ctx.strokeStyle = `rgba(${b.stroke}, ${b.alpha})`;
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.arc(x, y, s / 2, 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.lineTo(x + w / 12, y + h / 2 - 1);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.arc(x + i * s * 0.16, y, s * 0.05, 0, Math.PI * 2);
+        ctx.fill();
+      }
       break;
     }
   }
@@ -180,7 +260,7 @@ export function RisingBubbles() {
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(44, Math.max(20, Math.round((w * h) / 46000)));
+      const count = Math.min(60, Math.max(26, Math.round((w * h) / 33000)));
       bubbles = Array.from({ length: count }, () => makeBubble(w, h, true));
     };
     resize();

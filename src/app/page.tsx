@@ -8,6 +8,7 @@ import { PinnedSteps } from "@/components/landing/pinned-steps";
 import { Marquee } from "@/components/landing/marquee";
 import { ScrollProgress } from "@/components/landing/scroll-progress";
 import { InteractiveBackground } from "@/components/landing/interactive-background";
+import { ScrollBeam } from "@/components/landing/scroll-beam";
 import { FileText, MessageCircleReply } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,8 +65,9 @@ export default function LandingPage() {
 
   return (
     <SmoothScroll>
-    <div className="min-h-dvh overflow-x-clip">
+    <div className="relative min-h-dvh overflow-x-clip">
       <InteractiveBackground />
+      <ScrollBeam />
       <ScrollProgress />
       {/* Nav — floating glass pill */}
       <header className="sticky top-3 z-40 px-4">
