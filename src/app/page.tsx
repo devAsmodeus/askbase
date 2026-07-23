@@ -297,19 +297,19 @@ export default function LandingPage() {
           </Reveal>
           <div className="mt-12 grid gap-4 lg:grid-cols-3">
             {Object.values(PLANS).map((plan, i) => (
-              <Reveal key={plan.id} delay={i * 0.08} className="h-full">
+              <Reveal key={plan.id} delay={i * 0.08} className="relative h-full">
+              {plan.id === "pro" && (
+                <Badge className="absolute -top-2.5 left-1/2 z-10 -translate-x-1/2 border-0 bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white">
+                  Most popular
+                </Badge>
+              )}
               <Card
                 className={
                   plan.id === "pro"
-                    ? "relative h-full rounded-2xl border-indigo-400/70 bg-background/75 shadow-md backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                    ? "h-full rounded-2xl border-indigo-400/70 bg-background/75 shadow-md backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     : "h-full rounded-2xl border-white/40 bg-background/65 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-background/80 hover:shadow-lg dark:border-white/10"
                 }
               >
-                {plan.id === "pro" && (
-                  <Badge className="absolute -top-2.5 left-1/2 z-10 -translate-x-1/2 border-0 bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white">
-                    Most popular
-                  </Badge>
-                )}
                 <CardContent className="flex h-full flex-col gap-4 p-6">
                   <div>
                     <p className="font-semibold">{plan.name}</p>

@@ -110,11 +110,15 @@ export function RisingBubbles() {
     if (!ctx) return;
 
     const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    // Bubbles live in "world" space and shift with scroll at a slower rate,
+    // so they drift past like a parallax layer instead of sitting still.
+    const PARALLAX = 0.35;
     let w = 0;
     let h = 0;
     let bubbles: Bubble[] = [];
     let raf = 0;
     let t = 0;
+    let scrollY = window.scrollY;
     const mouse = { x: -9999, y: -9999 };
 
     const resize = () => {
@@ -130,26 +134,29 @@ export function RisingBubbles() {
 
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
+      const margin = 50;
+      const range = h + margin * 2;
       for (const b of bubbles) {
+        // Screen position = world position shifted by parallax scroll, wrapped
+        const raw = b.y - scrollY * PARALLAX;
+        const sy = ((((raw + margin) % range) + range) % range) - margin;
         const sway = Math.sin(t * b.swayFreq + b.phase) * b.swayAmp;
         let x = b.x + sway;
         // Cursor pushes bubbles aside
         const dx = x - mouse.x;
-        const dy = b.y - mouse.y;
+        const dy = sy - mouse.y;
         const d = Math.hypot(dx, dy);
         if (d < 140 && d > 1) {
           x += (dx / d) * (1 - d / 140) * 26;
         }
-        drawBubble(ctx, b, x);
+        drawBubble(ctx, { ...b, y: sy }, x);
       }
     };
 
     const step = () => {
       t += 0.016;
-      for (let i = 0; i < bubbles.length; i++) {
-        const b = bubbles[i];
-        b.y -= b.speed;
-        if (b.y < -b.size - 30) bubbles[i] = makeBubble(w, h, false);
+      for (const b of bubbles) {
+        b.y -= b.speed; // own buoyancy on top of the scroll parallax
       }
       draw();
       raf = requestAnimationFrame(step);
@@ -159,11 +166,15 @@ export function RisingBubbles() {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     };
+    const onScroll = () => {
+      scrollY = window.scrollY;
+    };
 
     if (prefersReduced) {
       draw();
     } else {
       window.addEventListener("pointermove", onMove, { passive: true });
+      window.addEventListener("scroll", onScroll, { passive: true });
       raf = requestAnimationFrame(step);
     }
     window.addEventListener("resize", resize);
@@ -171,6 +182,7 @@ export function RisingBubbles() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", resize);
     };
   }, [prefersReduced]);

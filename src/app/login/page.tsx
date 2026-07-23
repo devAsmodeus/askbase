@@ -49,14 +49,17 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-muted/30 p-4">
-      <Link href="/" className="mb-6 flex items-center gap-2 text-lg font-semibold">
-        <span className="flex size-8 items-center justify-center rounded-lg bg-indigo-500 text-white">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-indigo-100/70 via-background to-fuchsia-100/60 p-4 dark:from-indigo-950/40 dark:via-background dark:to-fuchsia-950/30">
+      <Link
+        href="/"
+        className="font-display mb-6 flex items-center gap-2 text-lg font-semibold"
+      >
+        <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white">
           <MessageSquareText className="size-4" />
         </span>
         AskBase
       </Link>
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm rounded-2xl border-white/50 bg-background/75 shadow-xl shadow-indigo-500/5 backdrop-blur-md dark:border-white/10">
         <CardHeader>
           <CardTitle>{mode === "signup" ? "Create your account" : "Welcome back"}</CardTitle>
           <CardDescription>
@@ -93,7 +96,11 @@ function LoginForm() {
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={busy}>
+            <Button
+              type="submit"
+              className="w-full rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white shadow-md shadow-indigo-500/20 transition-all hover:brightness-110"
+              disabled={busy}
+            >
               {busy && <Loader2 className="size-4 animate-spin" />}
               {mode === "signup" ? "Create account" : "Sign in"}
             </Button>

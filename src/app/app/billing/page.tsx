@@ -40,7 +40,7 @@ export default async function BillingPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Plan &amp; Billing</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Plan &amp; Billing</h1>
         <p className="text-sm text-muted-foreground">
           You&apos;re on the <span className="font-medium text-foreground">{plan.name}</span>{" "}
           plan

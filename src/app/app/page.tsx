@@ -32,7 +32,7 @@ export default async function BotsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Chatbots</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Chatbots</h1>
           <p className="text-sm text-muted-foreground">
             {botList.length} of {plan.maxBots} bots on the {plan.name} plan ·{" "}
             {usage?.messages ?? 0}/{plan.maxMessagesPerMonth} widget messages this month

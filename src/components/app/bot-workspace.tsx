@@ -95,7 +95,7 @@ export function BotWorkspace({
           <MessagesSquare className="size-4" />
         </span>
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-semibold tracking-tight">{bot.name}</h1>
+          <h1 className="font-display truncate text-xl font-semibold tracking-tight">{bot.name}</h1>
           <p className="truncate text-xs text-muted-foreground">
             {documents.filter((d) => d.status === "ready").length} documents ready ·{" "}
             {documents.reduce((n, d) => n + d.chunk_count, 0)} knowledge chunks

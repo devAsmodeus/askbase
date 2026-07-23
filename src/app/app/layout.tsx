@@ -22,12 +22,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const plan = PLANS[(profile?.plan ?? "free") as PlanId];
 
   return (
-    <div className="min-h-dvh bg-muted/30">
-      <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+    <div className="min-h-dvh bg-gradient-to-br from-indigo-100/60 via-background to-fuchsia-100/50 dark:from-indigo-950/40 dark:via-background dark:to-fuchsia-950/30">
+      <header className="sticky top-3 z-40 px-4">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between rounded-full border border-white/40 bg-background/60 px-5 shadow-lg shadow-indigo-500/5 backdrop-blur-xl dark:border-white/10">
           <div className="flex items-center gap-6">
             <Link href="/app" className="flex items-center gap-2 font-semibold">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-500 text-white">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white">
                 <MessageSquareText className="size-4" />
               </span>
               AskBase
@@ -49,7 +49,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex items-center gap-3">
             <Link href="/app/billing">
-              <Badge variant={plan.id === "free" ? "secondary" : "default"}>
+              <Badge
+                variant={plan.id === "free" ? "secondary" : "default"}
+                className={
+                  plan.id === "free"
+                    ? undefined
+                    : "border-0 bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white"
+                }
+              >
                 {plan.name}
               </Badge>
             </Link>
