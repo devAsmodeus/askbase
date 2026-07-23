@@ -1,0 +1,51 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 811 >>
+stream
+BT
+/F1 12 Tf
+50 780 Td
+16 TL
+(Nordwind Store - Support Handbook) Tj
+T* () Tj
+T* (Support hours: Monday to Friday, 9:00-18:00 CET.) Tj
+T* (Average first reply time: under 4 hours on business days.) Tj
+T* () Tj
+T* (Escalation policy: if a customer reports a defective item worth) Tj
+T* (more than $150, escalate to a senior agent immediately.) Tj
+T* (Chargebacks are handled by the finance team \(finance@nordwind.example\).) Tj
+T* () Tj
+T* (Discount rules: support agents may offer a one-time 10% discount) Tj
+T* (to resolve complaints. Discounts above 10% require manager approval.) Tj
+T* (Loyalty customers \(5+ orders\) get free express shipping upgrades.) Tj
+T* () Tj
+T* (Contact channels: email support@nordwind.example, live chat on the) Tj
+T* (website \(9:00-18:00 CET\), and phone +370 5 000 0000.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001103 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1173
+%%EOF
