@@ -29,7 +29,7 @@ const CHROME =
 const browser = await launch({
   executablePath: CHROME,
   headless: "shell",
-  args: ["--no-sandbox", "--force-prefers-reduced-motion=no", "--hide-scrollbars"],
+  args: ["--no-sandbox", "--hide-scrollbars"],
   defaultViewport: { width: 1440, height: 900 },
 });
 const page = await browser.newPage();
@@ -65,10 +65,11 @@ await shot("04-login");
 await page.click("button[type=button]"); // switch to sign-in mode
 await page.type("#email", email);
 await page.type("#password", password);
-await Promise.all([
-  page.waitForNavigation({ waitUntil: "networkidle2", timeout: 60000 }),
-  page.click("button[type=submit]"),
-]);
+await page.click("button[type=submit]");
+// Sign-in is a client-side router.push — wait for the URL, not a navigation
+await page.waitForFunction(() => location.pathname.startsWith("/app"), {
+  timeout: 60000,
+});
 
 // --- Dashboard ---
 await page.goto(`${appUrl}/app`, { waitUntil: "networkidle2" });
