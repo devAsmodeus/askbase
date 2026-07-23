@@ -4,22 +4,33 @@ import * as React from "react";
 import { useReducedMotion } from "motion/react";
 
 /**
- * Cann-style carbonation, themed for AskBase: thin outlined chat bubbles,
- * documents, question marks and plain bubbles slowly rising up the page,
- * swaying like fizz. Cursor gently pushes them aside.
+ * Cann-style carbonation, themed for AskBase: recognizable file-type badges
+ * (PDF, DOC, XLS, CSV, MD, TXT), books and chat bubbles slowly rise up the
+ * page like fizz, swaying and dodging the cursor.
  */
+
+type FileKind = { label: string; r: number; g: number; b: number };
+
+const FILE_KINDS: FileKind[] = [
+  { label: "PDF", r: 239, g: 68, b: 68 }, // red
+  { label: "DOC", r: 59, g: 130, b: 246 }, // blue
+  { label: "XLS", r: 22, g: 163, b: 74 }, // green
+  { label: "CSV", r: 5, g: 150, b: 105 }, // teal-green
+  { label: "MD", r: 99, g: 102, b: 241 }, // indigo
+  { label: "TXT", r: 100, g: 116, b: 139 }, // slate
+];
 
 const STROKES = [
   "99, 102, 241", // indigo
   "217, 70, 239", // fuchsia
-  "217, 119, 6", // amber (darker for contrast on pastel)
+  "217, 119, 6", // amber
 ];
 
-type Kind = "circle" | "doc" | "chat" | "question";
-const KINDS: Kind[] = ["circle", "circle", "circle", "doc", "chat", "question"];
+type Kind = "file" | "book" | "chat" | "circle";
 
 type Bubble = {
   kind: Kind;
+  file: FileKind;
   x: number;
   y: number;
   size: number;
@@ -32,9 +43,14 @@ type Bubble = {
 };
 
 function makeBubble(w: number, h: number, initial: boolean): Bubble {
-  const size = 8 + Math.random() * 26;
+  const roll = Math.random();
+  // Half the fizz is file badges, the rest keeps the airy feel
+  const kind: Kind = roll < 0.5 ? "file" : roll < 0.62 ? "book" : roll < 0.76 ? "chat" : "circle";
+  const size =
+    kind === "file" || kind === "book" ? 22 + Math.random() * 20 : 8 + Math.random() * 22;
   return {
-    kind: KINDS[Math.floor(Math.random() * KINDS.length)],
+    kind,
+    file: FILE_KINDS[Math.floor(Math.random() * FILE_KINDS.length)],
     x: Math.random() * w,
     y: initial ? Math.random() * h : h + size + Math.random() * 80,
     size,
@@ -47,53 +63,90 @@ function makeBubble(w: number, h: number, initial: boolean): Bubble {
   };
 }
 
-function drawBubble(ctx: CanvasRenderingContext2D, b: Bubble, x: number) {
-  ctx.strokeStyle = `rgba(${b.stroke}, ${b.alpha})`;
-  ctx.lineWidth = 1.2;
+function drawBubble(ctx: CanvasRenderingContext2D, b: Bubble, x: number, y: number) {
   const s = b.size;
 
   switch (b.kind) {
-    case "circle": {
+    case "file": {
+      // File badge: page with a folded corner, format color, label
+      const w = s * 0.82;
+      const h = s;
+      const fold = w * 0.32;
+      const { r, g, b: bl } = b.file;
+      const left = x - w / 2;
+      const top = y - h / 2;
+
       ctx.beginPath();
-      ctx.arc(x, b.y, s / 2, 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.moveTo(left + 3, top);
+      ctx.lineTo(left + w - fold, top);
+      ctx.lineTo(left + w, top + fold);
+      ctx.lineTo(left + w, top + h - 3);
+      ctx.quadraticCurveTo(left + w, top + h, left + w - 3, top + h);
+      ctx.lineTo(left + 3, top + h);
+      ctx.quadraticCurveTo(left, top + h, left, top + h - 3);
+      ctx.lineTo(left, top + 3);
+      ctx.quadraticCurveTo(left, top, left + 3, top);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(${r}, ${g}, ${bl}, 0.5)`;
+      ctx.fill();
+
+      // Folded corner flap
+      ctx.beginPath();
+      ctx.moveTo(left + w - fold, top);
+      ctx.lineTo(left + w - fold, top + fold);
+      ctx.lineTo(left + w, top + fold);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(${r}, ${g}, ${bl}, 0.75)`;
+      ctx.fill();
+
+      // Format label
+      ctx.font = `700 ${Math.round(s * 0.3)}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+      ctx.fillText(b.file.label, x, top + h * 0.62);
       break;
     }
-    case "doc": {
-      const w = s * 0.78;
-      const h = s;
+    case "book": {
+      // Open book: two page halves + spine
+      const w = s * 1.15;
+      const h = s * 0.75;
+      ctx.strokeStyle = `rgba(${b.stroke}, ${b.alpha + 0.12})`;
+      ctx.lineWidth = 1.4;
       ctx.beginPath();
-      ctx.roundRect(x - w / 2, b.y - h / 2, w, h, 2.5);
-      ctx.stroke();
-      ctx.beginPath();
-      for (let i = 0; i < 3; i++) {
-        const ly = b.y - h / 4 + (i * h) / 4;
-        ctx.moveTo(x - w / 4, ly);
-        ctx.lineTo(x + w / 4, ly);
-      }
+      ctx.moveTo(x, y - h * 0.28);
+      ctx.quadraticCurveTo(x - w * 0.28, y - h * 0.55, x - w / 2, y - h * 0.32);
+      ctx.lineTo(x - w / 2, y + h * 0.35);
+      ctx.quadraticCurveTo(x - w * 0.28, y + h * 0.12, x, y + h * 0.4);
+      ctx.quadraticCurveTo(x + w * 0.28, y + h * 0.12, x + w / 2, y + h * 0.35);
+      ctx.lineTo(x + w / 2, y - h * 0.32);
+      ctx.quadraticCurveTo(x + w * 0.28, y - h * 0.55, x, y - h * 0.28);
+      ctx.moveTo(x, y - h * 0.28);
+      ctx.lineTo(x, y + h * 0.4);
       ctx.stroke();
       break;
     }
     case "chat": {
       const w = s;
       const h = s * 0.72;
+      ctx.strokeStyle = `rgba(${b.stroke}, ${b.alpha})`;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.roundRect(x - w / 2, b.y - h / 2, w, h, h / 3);
+      ctx.roundRect(x - w / 2, y - h / 2, w, h, h / 3);
       ctx.stroke();
-      // tail
       ctx.beginPath();
-      ctx.moveTo(x - w / 6, b.y + h / 2);
-      ctx.lineTo(x - w / 4, b.y + h / 2 + s / 5);
-      ctx.lineTo(x + w / 12, b.y + h / 2);
+      ctx.moveTo(x - w / 6, y + h / 2);
+      ctx.lineTo(x - w / 4, y + h / 2 + s / 5);
+      ctx.lineTo(x + w / 12, y + h / 2);
       ctx.stroke();
       break;
     }
-    case "question": {
-      ctx.font = `${Math.round(s)}px sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = `rgba(${b.stroke}, ${b.alpha + 0.06})`;
-      ctx.fillText("?", x, b.y);
+    case "circle": {
+      ctx.strokeStyle = `rgba(${b.stroke}, ${b.alpha})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(x, y, s / 2, 0, Math.PI * 2);
+      ctx.stroke();
       break;
     }
   }
@@ -127,14 +180,14 @@ export function RisingBubbles() {
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(48, Math.max(22, Math.round((w * h) / 42000)));
+      const count = Math.min(44, Math.max(20, Math.round((w * h) / 46000)));
       bubbles = Array.from({ length: count }, () => makeBubble(w, h, true));
     };
     resize();
 
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
-      const margin = 50;
+      const margin = 60;
       const range = h + margin * 2;
       for (const b of bubbles) {
         // Screen position = world position shifted by parallax scroll, wrapped
@@ -149,7 +202,7 @@ export function RisingBubbles() {
         if (d < 140 && d > 1) {
           x += (dx / d) * (1 - d / 140) * 26;
         }
-        drawBubble(ctx, { ...b, y: sy }, x);
+        drawBubble(ctx, b, x, sy);
       }
     };
 
