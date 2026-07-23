@@ -1,5 +1,10 @@
 # AskBase — turn your docs into an embeddable AI chatbot
 
+[![CI](https://github.com/devAsmodeus/askbase/actions/workflows/ci.yml/badge.svg)](https://github.com/devAsmodeus/askbase/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
+[![Supabase](https://img.shields.io/badge/Supabase-pgvector-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
+
 AskBase is a SaaS MVP: upload your company docs and knowledge, get a ChatGPT-style
 chatbot inside the app, and embed the same bot on any website with **one line of code**.
 Answers are generated with RAG strictly from your content, with source documents cited
@@ -48,18 +53,34 @@ landing page itself is the widget, eating its own dog food.
 
 ## Architecture
 
-```
-Browser ──► Next.js (app + API routes)
-              │  /api/ingest        parse → chunk → embed → store (auth, RLS)
-              │  /api/chat          playground RAG chat (auth)
-              │  /api/widget/chat   public widget chat (quota + domain checks)
-              │  /widget.js         embeddable loader script
-              ▼
-          Supabase
-              ├─ Postgres + pgvector (bots, documents, chunks, conversations,
-              │                       messages, usage_counters, billing_events)
-              ├─ Auth (email/password, auto-confirm for MVP)
-              └─ Edge Function `embed` (gte-small, 384-dim embeddings)
+```mermaid
+flowchart LR
+    subgraph Client
+        A[App UI<br/>dashboard & playground]
+        W[Customer website<br/>widget.js → iframe]
+    end
+
+    subgraph NextJS["Next.js (App Router)"]
+        I["/api/ingest<br/>parse → chunk → embed → store"]
+        C["/api/chat<br/>playground RAG chat (auth)"]
+        WC["/api/widget/chat<br/>public chat (quota + domain checks)"]
+        WL["/widget.js<br/>embeddable loader"]
+    end
+
+    subgraph Supabase
+        PG[("Postgres + pgvector<br/>bots · documents · chunks<br/>conversations · messages<br/>usage_counters · billing_events")]
+        AU[Auth<br/>email/password]
+        EF[Edge Function embed<br/>gte-small, 384-dim]
+    end
+
+    LLM[Claude API<br/>optional — demo mode without it]
+
+    A --> I & C
+    W --> WL & WC
+    I --> EF --> PG
+    C & WC --> PG
+    C & WC -.-> LLM
+    A --> AU
 ```
 
 Chat responses stream as plain text with a one-line JSON meta prefix
@@ -107,6 +128,15 @@ npm run dev
 ```
 
 Open http://localhost:3000.
+
+> **Behind a corporate proxy?** If server-side requests to Supabase fail with
+> `fetch failed … self-signed certificate in certificate chain`, your network
+> intercepts TLS. Start the dev server with the system certificate store
+> (Node ≥ 22.15; the flag is not accepted via `NODE_OPTIONS`):
+>
+> ```bash
+> node --use-system-ca node_modules/next/dist/bin/next dev
+> ```
 
 ## Product walkthrough (written tutorial)
 
