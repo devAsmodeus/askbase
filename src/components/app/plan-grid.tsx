@@ -81,17 +81,20 @@ export function PlanGrid({ currentPlan }: { currentPlan: PlanId }) {
                   ))}
                 </ul>
                 <Button
-                  variant={isCurrent ? "outline" : isUpgrade ? "default" : "outline"}
+                  variant={isCurrent || !isUpgrade ? "outline" : "default"}
                   disabled={isCurrent || busy}
+                  className={
+                    !isCurrent && isUpgrade
+                      ? "rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white shadow-md shadow-indigo-500/20 transition-all hover:brightness-110"
+                      : "rounded-full"
+                  }
                   onClick={() =>
                     plan.id === "free" ? switchPlan(plan) : setCheckoutPlan(plan)
                   }
                 >
                   {isCurrent
                     ? "Current plan"
-                    : plan.id === "free"
-                      ? "Downgrade to Free"
-                      : `Upgrade to ${plan.name}`}
+                    : `${isUpgrade ? "Upgrade" : "Downgrade"} to ${plan.name}`}
                 </Button>
               </CardContent>
             </Card>
@@ -131,7 +134,7 @@ function CheckoutDialog({
     <Dialog open={plan !== null} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Upgrade to {plan?.name}</DialogTitle>
+          <DialogTitle>Switch to {plan?.name}</DialogTitle>
           <DialogDescription>
             ${plan?.priceMonthly}/month, billed monthly. Cancel anytime.
           </DialogDescription>

@@ -140,6 +140,10 @@ Open http://localhost:3000.
 
 ## Product walkthrough (written tutorial)
 
+> 📸 **Illustrated version:** [docs/PRESENTATION.md](docs/PRESENTATION.md) —
+> the same walkthrough with screenshots of every step, captured automatically
+> by `scripts/capture-screens.mjs`.
+
 1. **Landing** (`/`) — features, how-it-works, pricing. The chat bubble in the corner
    is the real widget pointed at a demo bot.
 2. **Sign up** (`/login`) — email + password, no confirmation email needed in the MVP
