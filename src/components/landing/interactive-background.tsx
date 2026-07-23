@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
+import { KnowledgeField } from "./knowledge-field";
 
 /**
  * Living page background: a soft gradient glow follows the cursor while two
@@ -53,6 +54,9 @@ export function InteractiveBackground() {
 
       {/* Soft veil keeps text readable without killing the color */}
       <div className="absolute inset-0 bg-background/25" />
+
+      {/* Knowledge constellation — nodes & links reacting to the cursor */}
+      <KnowledgeField />
     </div>
   );
 }
