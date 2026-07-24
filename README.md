@@ -5,6 +5,8 @@
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![Supabase](https://img.shields.io/badge/Supabase-pgvector-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
 
+![AskBase landing](docs/walkthrough/01-landing-hero.png)
+
 AskBase is a SaaS MVP: upload your company docs and knowledge, get a ChatGPT-style
 chatbot inside the app, and embed the same bot on any website with **one line of code**.
 Answers are generated with RAG strictly from your content, with source documents cited
@@ -13,6 +15,12 @@ on every reply.
 **Live demo flow:** landing page → sign up → create a bot → upload docs → test in the
 playground → copy the embed snippet → chat bubble on your site. The chat bubble on the
 landing page itself is the widget, eating its own dog food.
+
+| RAG answers with cited sources | Live widget on any site |
+|---|---|
+| ![Playground](docs/walkthrough/07-playground-ai-answer.png) | ![Widget](docs/walkthrough/10-widget-live.png) |
+
+📸 Full illustrated walkthrough: **[docs/PRESENTATION.md](docs/PRESENTATION.md)**
 
 ## Features
 
